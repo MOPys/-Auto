@@ -1,0 +1,66 @@
+// ==UserScript==
+// @name         Auto Select "优秀" Option and Click Save on GDPU Webpage with Delay
+// @namespace    http://tampermonkey.net/
+// @version      0.6
+// @description  Automatically selects the "优秀" radio button and clicks the save button on the GDPU webpage with delay
+// @author       You
+// @match        https://jwsys.gdpu.edu.cn/*
+// @match        https://webvpn.gdpu.edu.cn/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // 创建一个 MutationObserver 来监视 DOM 变化
+    const observer = new MutationObserver((mutationsList, observer) => {
+        // 检查是否有变化，并重新执行勾选操作
+        mutationsList.forEach(mutation => {
+            if (mutation.type === 'childList') {
+                selectExcellentOption();
+            }
+        });
+    });
+
+    // 配置 MutationObserver
+    observer.observe(document.body, {
+        childList: true,   // 监听子元素的变化
+        subtree: true      // 监听整个页面的变化
+    });
+
+    // 等待页面加载完成后勾选“优秀”选项并点击保存按钮
+    window.addEventListener('load', function() {
+        selectExcellentOption();
+        // 延时执行点击保存操作
+        setTimeout(() => {
+            clickSaveButton();
+        }, 2000); // 延时 2 秒后点击保存按钮
+    });
+
+    // 选择“优秀”选项的函数
+    function selectExcellentOption() {
+        // 获取所有的 radio 按钮
+        const radioButtons = document.querySelectorAll('.radio-pjf');
+
+        // 遍历所有的 radio 按钮，寻找包含“优秀”的标签并勾选它
+        radioButtons.forEach(button => {
+            const label = button.closest('label'); // 获取按钮的父级 label 元素
+            if (label && label.textContent.includes('优秀')) {
+                button.checked = true; // 勾选该选项
+                console.log('成功勾选“优秀”选项');
+            }
+        });
+    }
+
+    // 点击保存按钮的函数
+    function clickSaveButton() {
+        // 找到保存按钮
+        const saveButton = document.querySelector('#btn_xspj_bc');
+        if (saveButton) {
+            saveButton.click(); // 模拟点击保存按钮
+            console.log('点击保存按钮');
+        } else {
+            console.log('未找到保存按钮');
+        }
+    }
+})();
